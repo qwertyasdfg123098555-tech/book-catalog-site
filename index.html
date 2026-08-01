@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Каталог книг — демо</title>
+<style>
+  :root {
+    --bg: #2a2a2a;
+    --ink: #f0f0f0;
+    --accent: #e02424;
+    --accent-dark: #9e1a1a;
+    --accent-soft: #4a2424;
+    --line: #444444;
+    --panel: #383838;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  header h1 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+  }
+  header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    min-height: 2.8em;
+    color: #999999;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  /* ===== Главная страница: список авторов ===== */
+  #authorSearch {
+    display: block;
+    width: 100%;
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    font-family: sans-serif;
+    font-size: 14px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  #authorSearch::placeholder { color: #8a8a8a; }
+  #authorSearch:focus { outline: none; border-color: var(--accent); }
+
+  #authorButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .no-results {
+    padding: 10px 0;
+    font-family: sans-serif;
+    font-size: 13px;
+    color: #999999;
+  }
+  .author-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: var(--panel);
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .author-btn:hover { background: var(--accent-soft); }
+
+  /* ===== Страница автора ===== */
+  .back-link {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 8px 16px;
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background: var(--accent-dark);
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 0 4px 1px rgba(158, 26, 26, 0.28), 0 0 9px 2px rgba(158, 26, 26, 0.14);
+    animation: glow-pulse 2.2s ease-in-out infinite;
+  }
+  .back-link:hover {
+    box-shadow: 0 0 6px 2px rgba(158, 26, 26, 0.4), 0 0 13px 3px rgba(158, 26, 26, 0.2);
+  }
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 4px 1px rgba(158, 26, 26, 0.28), 0 0 9px 2px rgba(158, 26, 26, 0.14);
+    }
+    50% {
+      box-shadow: 0 0 6px 2px rgba(158, 26, 26, 0.42), 0 0 13px 3px rgba(158, 26, 26, 0.22);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .back-link { animation: none; }
+  }
+  .author-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 14px;
+  }
+  .author-header h2 {
+    margin: 0;
+    font-size: 26px;
+  }
+  .bio-btn {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--accent);
+    padding: 4px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .bio-btn:hover { background: var(--accent-soft); }
+  .book-list {
+    display: grid;
+    gap: 12px;
+  }
+  .book-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .book-card .cover {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    display: block;
+    background: #00000022;
+  }
+  .book-card .card-body {
+    padding: 14px 18px;
+  }
+  .book-card h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+  .book-card .book-author {
+    display: block;
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+  .book-card .description {
+    font-family: sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink);
+    opacity: 0.85;
+    margin: 6px 0;
+  }
+  .book-card .file-info {
+    display: block;
+    font-family: sans-serif;
+    font-size: 12px;
+    color: #999999;
+    margin-bottom: 10px;
+  }
+  .book-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .download-btn {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 13px;
+    color: #fff;
+    background: var(--accent-dark);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .read-btn {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--accent-dark);
+    background: #ffffff;
+    border: 1px solid var(--accent-dark);
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .download-btn:hover, .read-btn:hover { opacity: 0.85; }
+  .empty {
+    color: #999999;
+    font-family: sans-serif;
+    font-size: 14px;
+  }
+  .bio-view p { line-height: 1.7; max-width: 60ch; }
+
+  @media (max-width: 640px) {
+    main { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Каталог книг</h1>
+  <p id="headerSubtitle">Выберите автора — откроется страница с его книгами</p>
+</header>
+
+<main id="content"></main>
+
+<script>
+// ====== ДАННЫЕ ======
+// Это единственное место, которое нужно редактировать при добавлении
+// нового автора или книги. Ничего в остальном коде менять не нужно.
+const AUTHORS = [
+  {
+    id: "ibn-taymiyyah",
+    name: "Ибн Таймия",
+    bio: null,
+    books: [
+      {
+        title: "Пример: Книга об уповании на Аллаха",
+        cover: "https://ЗАМЕНИТЕ_ССЫЛКУ_НА_КАРТИНКУ_ОБЛОЖКИ.jpg",
+        description: "Эта книга содержит пророческие хадисы и слова праведных предшественников, связанные с упованием на Аллаха.",
+        format: "PDF",
+        size: "2.0 МБ",
+        readUrl: "https://ЗАМЕНИТЕ_ССЫЛКУ_ДЛЯ_ЧТЕНИЯ_ОНЛАЙН",
+        downloadUrl: "https://ЗАМЕНИТЕ_ССЫЛКУ_НА_СКАЧИВАНИЕ_ФАЙЛА"
+      }
+    ]
+  },
+  {
+    id: "ibn-qayyim",
+    name: "Ибн Кайим аль-Джаузий",
+    bio: null,
+    books: []
+  },
+  {
+    id: "tafsir-quran",
+    name: "Тафсир Корана",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "names-of-allah",
+    name: "Имена Аллаха",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "other-authors",
+    name: "Другие авторы",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "prophets-stories",
+    name: "Истории Пророков",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "hadiths",
+    name: "Хадисы",
+    bio: null,
+    hideBio: true,
+    books: [
+      {
+        title: "Мухтасар Сахих Аль-Бухари Полный вариант",
+        cover: "https://i.ibb.co/gM3BHgqw/image.jpg",
+        description: "",
+        format: "PDF",
+        size: "ЗАМЕНИТЕ_РАЗМЕР",
+        readUrl: "ЗАМЕНИТЕ_ССЫЛКУ_ДЛЯ_ЧТЕНИЯ",
+        downloadUrl: "ЗАМЕНИТЕ_ССЫЛКУ_ДЛЯ_СКАЧИВАНИЯ"
+      }
+    ]
+  },
+  {
+    id: "seerah",
+    name: "Сира",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "rightly-guided-caliphs",
+    name: "Жизнеописание Праведных халифов",
+    bio: null,
+    hideBio: true,
+    books: []
+  },
+  {
+    id: "companions-stories",
+    name: "Истории сподвижников",
+    bio: null,
+    hideBio: true,
+    books: []
+  }
+];
+
+// ====== ЛОГИКА (не нужно трогать при добавлении книг) ======
+const content = document.getElementById('content');
+
+// Роутинг по хешу в адресе: #author/pushkin, #bio/pushkin, или пусто (главная)
+function router() {
+  const hash = window.location.hash;
+  const subtitle = document.getElementById('headerSubtitle');
+  const defaultSubtitle = 'Выберите автора — откроется страница с его книгами';
+
+  if (hash.startsWith('#author/')) {
+    const id = hash.replace('#author/', '');
+    subtitle.textContent = (id === 'other-authors') ? 'Книги разных авторов' : '';
+    showAuthorBooks(id);
+  } else if (hash.startsWith('#bio/')) {
+    subtitle.textContent = '';
+    showAuthorBio(hash.replace('#bio/', ''));
+  } else {
+    subtitle.textContent = defaultSubtitle;
+    showHome();
+  }
+  window.scrollTo(0, 0);
+}
+
+function showHome(filterText = '') {
+  const query = filterText.trim().toLowerCase();
+  const filtered = AUTHORS
+    .filter(a => a.name.toLowerCase().includes(query))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+  let listHtml = '';
+  if (filtered.length === 0) {
+    listHtml = '<div class="no-results">Ничего не найдено</div>';
+  } else {
+    filtered.forEach(author => {
+      listHtml += `<button class="author-btn" data-id="${author.id}">${author.name}</button>`;
+    });
+  }
+
+  content.innerHTML = `
+    <input type="text" id="authorSearch" placeholder="Поиск автора…" autocomplete="off" value="${filterText}">
+    <div id="authorButtons">${listHtml}</div>
+  `;
+
+  const search = document.getElementById('authorSearch');
+  search.addEventListener('input', () => showHome(search.value));
+  // курсор в конец текста после перерисовки
+  search.focus();
+  search.setSelectionRange(search.value.length, search.value.length);
+
+  content.querySelectorAll('.author-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.location.hash = `author/${btn.dataset.id}`;
+    });
+  });
+}
+
+function showAuthorBooks(id) {
+  const author = AUTHORS.find(a => a.id === id);
+  if (!author) { showHome(); return; }
+
+  let html = `
+    <span class="back-link" data-back="home">← Все авторы</span>
+    <div class="author-header">
+      <h2>${author.name}</h2>
+      ${author.hideBio ? '' : `<span class="bio-btn" data-bio="${author.id}">Биография</span>`}
+    </div>
+    <div class="book-list">
+  `;
+
+  if (author.books.length === 0) {
+    html += `<p class="empty">Пока нет книг в этом разделе.</p>`;
+  } else {
+    const sortedBooks = [...author.books].sort((a, b) =>
+      a.title.localeCompare(b.title, 'ru', { numeric: true })
+    );
+    sortedBooks.forEach(book => {
+      html += `
+        <div class="book-card">
+          ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
+          <div class="card-body">
+            <h3>${book.title}</h3>
+            ${book.author ? `<span class="book-author">${book.author}</span>` : ''}
+            ${book.description ? `<p class="description">${book.description}</p>` : ''}
+            <span class="file-info">${book.format}, ${book.size}</span>
+            <div class="book-actions">
+              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}" target="_blank" rel="noopener">Читать</a>` : ''}
+              <a class="download-btn" href="${book.downloadUrl}" download>Скачать</a>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+
+  content.querySelector('[data-back]').addEventListener('click', () => {
+    window.location.hash = '';
+  });
+
+  const bioBtn = content.querySelector('[data-bio]');
+  if (bioBtn) {
+    bioBtn.addEventListener('click', () => {
+      window.location.hash = `bio/${id}`;
+    });
+  }
+}
+
+function showAuthorBio(id) {
+  const author = AUTHORS.find(a => a.id === id);
+  if (!author) { showHome(); return; }
+
+  const bioText = author.bio ? author.bio : 'Биография скоро появится.';
+
+  content.innerHTML = `
+    <span class="back-link" data-back="author">← Назад к книгам</span>
+    <div class="bio-view">
+      <h2>${author.name}</h2>
+      <p>${bioText}</p>
+    </div>
+  `;
+
+  content.querySelector('[data-back]').addEventListener('click', () => {
+    window.location.hash = `author/${id}`;
+  });
+}
+
+window.addEventListener('hashchange', router);
+router();
+</script>
+
+</body>
+</html>
