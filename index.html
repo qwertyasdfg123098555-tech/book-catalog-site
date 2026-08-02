@@ -204,6 +204,8 @@
     padding: 8px 14px;
     border-radius: 3px;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
   }
   .read-btn {
     display: inline-block;
@@ -306,8 +308,8 @@ const AUTHORS = [
         description: "",
         format: "PDF",
         size: "9 МБ",
-        readUrl: "https://u.pcloud.link/publink/show?code=XZhoso5ZCE3rz8hwTmyYruEeKvAg3QqSo0Ak",
-        downloadUrl: "https://u.pcloud.link/publink/show?code=XZhoso5ZCE3rz8hwTmyYruEeKvAg3QqSo0Ak"
+        readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/mukhtasar-sahih-bukhari.pdf",
+        downloadUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/mukhtasar-sahih-bukhari.pdf"
       }
     ]
   },
@@ -379,7 +381,6 @@ function showHome(filterText = '') {
 
   const search = document.getElementById('authorSearch');
   search.addEventListener('input', () => showHome(search.value));
-  // курсор в конец текста после перерисовки
   search.focus();
   search.setSelectionRange(search.value.length, search.value.length);
 
@@ -420,7 +421,7 @@ function showAuthorBooks(id) {
             <span class="file-info">${book.format}, ${book.size}</span>
             <div class="book-actions">
               ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}" target="_blank" rel="noopener">Читать</a>` : ''}
-              <a class="download-btn" href="${book.downloadUrl}" download>Скачать</a>
+              <button class="download-btn" data-url="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</button>
             </div>
           </div>
         </div>
@@ -440,6 +441,34 @@ function showAuthorBooks(id) {
     bioBtn.addEventListener('click', () => {
       window.location.hash = `bio/${id}`;
     });
+  }
+
+  content.querySelectorAll('.download-btn').forEach(btn => {
+    btn.addEventListener('click', () => downloadFile(btn.dataset.url, btn.dataset.filename, btn));
+  });
+}
+
+// Скачивает файл по-настоящему (а не просто открывает), даже если он на другом домене
+async function downloadFile(url, filename, btn) {
+  const originalText = btn.textContent;
+  btn.textContent = 'Загрузка...';
+  btn.disabled = true;
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    window.open(url, '_blank');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
   }
 }
 
