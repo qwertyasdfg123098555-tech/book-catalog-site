@@ -493,7 +493,7 @@ function showReader(path) {
   content.innerHTML = `
     <span class="back-link" data-back="reader">← Назад к книгам</span>
     <h2 style="margin: 0 0 12px; font-size: 18px;">${book.title}</h2>
-    <iframe src="${book.readUrl}" class="pdf-frame"></iframe>
+    <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(book.readUrl)}" class="pdf-frame"></iframe>
   `;
 
   content.querySelector('[data-back]').addEventListener('click', () => {
