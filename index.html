@@ -430,7 +430,7 @@ function showAuthorBooks(id) {
             ${book.description ? `<p class="description">${book.description}</p>` : ''}
             <span class="file-info">${book.format}, ${book.size}</span>
             <div class="book-actions">
-              ${book.readUrl ? `<a class="read-btn" href="#read/${author.id}/${bookIndex}">Читать</a>` : ''}
+              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}" target="_blank">Читать</a>` : ''}
               <button class="download-btn" data-url="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</button>
             </div>
           </div>
@@ -453,9 +453,9 @@ function showAuthorBooks(id) {
     });
   }
 
-  content.querySelectorAll('.download-btn').forEach(btn => {
-    btn.addEventListener('click', () => downloadFile(btn.dataset.url, btn.dataset.filename, btn));
-  });
+  
+    
+  
 }
 
 async function downloadFile(url, filename, btn) {
