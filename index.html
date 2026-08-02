@@ -226,6 +226,13 @@
     font-size: 14px;
   }
   .bio-view p { line-height: 1.7; max-width: 60ch; }
+  .pdf-frame {
+    width: 100%;
+    height: 80vh;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+  }
 
   @media (max-width: 640px) {
     main { padding: 20px 16px; }
@@ -339,7 +346,6 @@ const AUTHORS = [
 // ====== ЛОГИКА (не нужно трогать при добавлении книг) ======
 const content = document.getElementById('content');
 
-// Роутинг по хешу в адресе: #author/pushkin, #bio/pushkin, или пусто (главная)
 function router() {
   const hash = window.location.hash;
   const subtitle = document.getElementById('headerSubtitle');
@@ -352,6 +358,9 @@ function router() {
   } else if (hash.startsWith('#bio/')) {
     subtitle.textContent = '';
     showAuthorBio(hash.replace('#bio/', ''));
+  } else if (hash.startsWith('#read/')) {
+    subtitle.textContent = '';
+    showReader(hash.replace('#read/', ''));
   } else {
     subtitle.textContent = defaultSubtitle;
     showHome();
@@ -411,6 +420,7 @@ function showAuthorBooks(id) {
       a.title.localeCompare(b.title, 'ru', { numeric: true })
     );
     sortedBooks.forEach(book => {
+      const bookIndex = author.books.indexOf(book);
       html += `
         <div class="book-card">
           ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
@@ -420,7 +430,7 @@ function showAuthorBooks(id) {
             ${book.description ? `<p class="description">${book.description}</p>` : ''}
             <span class="file-info">${book.format}, ${book.size}</span>
             <div class="book-actions">
-              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
+              ${book.readUrl ? `<a class="read-btn" href="#read/${author.id}/${bookIndex}">Читать</a>` : ''}
               <button class="download-btn" data-url="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</button>
             </div>
           </div>
@@ -448,7 +458,6 @@ function showAuthorBooks(id) {
   });
 }
 
-// Скачивает файл по-настоящему (а не просто открывает), даже если он на другом домене
 async function downloadFile(url, filename, btn) {
   const originalText = btn.textContent;
   btn.textContent = 'Загрузка...';
@@ -470,6 +479,26 @@ async function downloadFile(url, filename, btn) {
     btn.textContent = originalText;
     btn.disabled = false;
   }
+}
+
+function showReader(path) {
+  const parts = path.split('/');
+  const authorId = parts[0];
+  const bookIndex = parseInt(parts[1], 10);
+  const author = AUTHORS.find(a => a.id === authorId);
+  const book = author && author.books[bookIndex];
+
+  if (!book) { showHome(); return; }
+
+  content.innerHTML = `
+    <span class="back-link" data-back="reader">← Назад к книгам</span>
+    <h2 style="margin: 0 0 12px; font-size: 18px;">${book.title}</h2>
+    <iframe src="${book.readUrl}" class="pdf-frame"></iframe>
+  `;
+
+  content.querySelector('[data-back]').addEventListener('click', () => {
+    window.location.hash = `author/${authorId}`;
+  });
 }
 
 function showAuthorBio(id) {
