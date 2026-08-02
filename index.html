@@ -431,7 +431,7 @@ function showAuthorBooks(id) {
             <span class="file-info">${book.format}, ${book.size}</span>
             <div class="book-actions">
               ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
-              ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" download="${book.title}.pdf">Скачать</a>` : ''}
+              ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</a>` : ''}
             </div>
           </div>
         </div>
@@ -452,6 +452,33 @@ function showAuthorBooks(id) {
       window.location.hash = `bio/${id}`;
     });
   }
+
+  content.querySelectorAll('.download-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const url = btn.getAttribute('href');
+      const filename = btn.dataset.filename;
+      const originalText = btn.textContent;
+      btn.textContent = 'Загрузка...';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('bad response');
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        window.location.href = url;
+      } finally {
+        btn.textContent = originalText;
+      }
+    });
+  });
 }
 
 function showReader(path) {
