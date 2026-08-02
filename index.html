@@ -430,8 +430,8 @@ function showAuthorBooks(id) {
             ${book.description ? `<p class="description">${book.description}</p>` : ''}
             <span class="file-info">${book.format}, ${book.size}</span>
             <div class="book-actions">
-              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}" target="_blank" rel="noopener">Читать</a>` : ''}
-              ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" target="_blank" rel="noopener">Скачать</a>` : ''}
+              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
+              ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" download="${book.title}.pdf">Скачать</a>` : ''}
             </div>
           </div>
         </div>
