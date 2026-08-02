@@ -481,7 +481,7 @@ async function downloadFile(url, filename, btn) {
   }
 }
 
-function showReader(path) {
+async function showReader(path) {
   const parts = path.split('/');
   const authorId = parts[0];
   const bookIndex = parseInt(parts[1], 10);
@@ -493,12 +493,27 @@ function showReader(path) {
   content.innerHTML = `
     <span class="back-link" data-back="reader">← Назад к книгам</span>
     <h2 style="margin: 0 0 12px; font-size: 18px;">${book.title}</h2>
-    <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(book.readUrl)}" class="pdf-frame"></iframe>
+    <div id="readerStatus" style="padding:30px 10px;text-align:center;">Загрузка книги...</div>
+    <iframe id="pdfFrame" class="pdf-frame" style="display:none;"></iframe>
   `;
 
   content.querySelector('[data-back]').addEventListener('click', () => {
     window.location.hash = `author/${authorId}`;
   });
+
+  try {
+    const response = await fetch(book.readUrl);
+    if (!response.ok) throw new Error('bad response');
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const frame = document.getElementById('pdfFrame');
+    const status = document.getElementById('readerStatus');
+    frame.src = blobUrl;
+    frame.style.display = 'block';
+    status.style.display = 'none';
+  } catch (err) {
+    document.getElementById('readerStatus').textContent = 'Не удалось загрузить книгу. Проверьте интернет и попробуйте снова.';
+  }
 }
 
 function showAuthorBio(id) {
