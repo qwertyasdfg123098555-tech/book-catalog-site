@@ -269,10 +269,6 @@
 // ====== ДАННЫЕ ======
 // Это единственное место, которое нужно редактировать при добавлении
 // нового автора или книги. Ничего в остальном коде менять не нужно.
-//
-// Обычная книга (один файл): title, cover, description, format, size, readUrl, downloadUrl
-// Многотомник (несколько файлов под одной обложкой): title, cover, description,
-//   volumes: [ { title, format, size, readUrl, downloadUrl }, ... ]
 const AUTHORS = [
   {
     id: "ibn-taymiyyah",
@@ -306,7 +302,17 @@ const AUTHORS = [
     id: "ibn-qayyim",
     name: "Ибн Кайим аль-Джаузий",
     bio: null,
-    books: []
+    books: [
+      {
+        title: "ФАУАИД - Полезные наставления",
+        cover: "https://i.ibb.co/j9kWhjZy/FAUAID-Poleznye-nastavleniya.webp",
+        description: "",
+        format: "PDF",
+        size: "1.93 МБ",
+        readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/FAUAID%20-%20Poleznye%20nastavleniya.pdf",
+        downloadUrl: "https://qwertyasdfg123098555-tech.github.io/book-catalog-site/FAUAID%20-%20Poleznye%20nastavleniya.pdf"
+      }
+    ]
   },
   {
     id: "tafsir-quran",
