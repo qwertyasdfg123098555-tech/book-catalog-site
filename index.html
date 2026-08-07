@@ -194,6 +194,23 @@
     display: flex;
     gap: 10px;
   }
+  .volume-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .volume-item {
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .volume-item:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+  .volume-item h4 {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
   .download-btn {
     display: inline-block;
     font-family: sans-serif;
@@ -252,6 +269,10 @@
 // ====== ДАННЫЕ ======
 // Это единственное место, которое нужно редактировать при добавлении
 // нового автора или книги. Ничего в остальном коде менять не нужно.
+//
+// Обычная книга (один файл): title, cover, description, format, size, readUrl, downloadUrl
+// Многотомник (несколько файлов под одной обложкой): title, cover, description,
+//   volumes: [ { title, format, size, readUrl, downloadUrl }, ... ]
 const AUTHORS = [
   {
     id: "ibn-taymiyyah",
@@ -259,22 +280,25 @@ const AUTHORS = [
     bio: null,
     books: [
       {
-        title: "1. Акида аль-Уаситийя",
+        title: "Акида аль-Уаситийя",
         cover: "https://i.ibb.co/RGvJm0j3/Al-Akida-Al-Uasitia.jpg",
         description: "",
-        format: "PDF",
-        size: "569 КБ",
-        readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/Al-Akida_Al-Uasitia.0001.pdf",
-        downloadUrl: "https://qwertyasdfg123098555-tech.github.io/book-catalog-site/Al-Akida_Al-Uasitia.0001.pdf"
-      },
-      {
-        title: "2. Комментарии к книге Акида аль-Уаситийя",
-        cover: "https://i.ibb.co/RGvJm0j3/Al-Akida-Al-Uasitia.jpg",
-        description: "",
-        format: "PDF",
-        size: "1.22 МБ",
-        readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/Al-Akida_Al-Uasitia.0002.pdf",
-        downloadUrl: "https://qwertyasdfg123098555-tech.github.io/book-catalog-site/Al-Akida_Al-Uasitia.0002.pdf"
+        volumes: [
+          {
+            title: "1. Акида аль-Уаситийя",
+            format: "PDF",
+            size: "569 КБ",
+            readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/Al-Akida_Al-Uasitia.0001.pdf",
+            downloadUrl: "https://qwertyasdfg123098555-tech.github.io/book-catalog-site/Al-Akida_Al-Uasitia.0001.pdf"
+          },
+          {
+            title: "2. Комментарии к книге Акида аль-Уаситийя",
+            format: "PDF",
+            size: "1.22 МБ",
+            readUrl: "https://cdn.jsdelivr.net/gh/qwertyasdfg123098555-tech/book-catalog-site@main/Al-Akida_Al-Uasitia.0002.pdf",
+            downloadUrl: "https://qwertyasdfg123098555-tech.github.io/book-catalog-site/Al-Akida_Al-Uasitia.0002.pdf"
+          }
+        ]
       }
     ]
   },
@@ -430,21 +454,47 @@ function showAuthorBooks(id) {
     );
     sortedBooks.forEach(book => {
       const bookIndex = author.books.indexOf(book);
-      html += `
-        <div class="book-card">
-          ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
-          <div class="card-body">
-            <h3>${book.title}</h3>
-            ${book.author ? `<span class="book-author">${book.author}</span>` : ''}
-            ${book.description ? `<p class="description">${book.description}</p>` : ''}
-            <span class="file-info">${book.format}, ${book.size}</span>
-            <div class="book-actions">
-              ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
-              ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</a>` : ''}
+      if (book.volumes) {
+        let volumesHtml = '';
+        book.volumes.forEach(vol => {
+          volumesHtml += `
+            <div class="volume-item">
+              <h4>${vol.title}</h4>
+              <span class="file-info">${vol.format}, ${vol.size}</span>
+              <div class="book-actions">
+                ${vol.readUrl ? `<a class="read-btn" href="${vol.readUrl}">Читать</a>` : ''}
+                ${vol.downloadUrl ? `<a class="download-btn" href="${vol.downloadUrl}" data-filename="${vol.title}.pdf">Скачать</a>` : ''}
+              </div>
+            </div>
+          `;
+        });
+        html += `
+          <div class="book-card">
+            ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
+            <div class="card-body">
+              <h3>${book.title}</h3>
+              ${book.description ? `<p class="description">${book.description}</p>` : ''}
+              <div class="volume-list">${volumesHtml}</div>
             </div>
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        html += `
+          <div class="book-card">
+            ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
+            <div class="card-body">
+              <h3>${book.title}</h3>
+              ${book.author ? `<span class="book-author">${book.author}</span>` : ''}
+              ${book.description ? `<p class="description">${book.description}</p>` : ''}
+              <span class="file-info">${book.format}, ${book.size}</span>
+              <div class="book-actions">
+                ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
+                ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</a>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
     });
   }
 
