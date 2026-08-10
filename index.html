@@ -530,10 +530,48 @@ function router() {
   window.scrollTo(0, 0);
 }
 
+// ====== ПОИСК (нечёткое совпадение, терпимое к опечаткам) ======
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const d = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) d[i][0] = i;
+  for (let j = 0; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+    }
+  }
+  return d[m][n];
+}
+
+function fuzzyMatch(text, query) {
+  if (!query) return true;
+  text = text.toLowerCase();
+  query = query.toLowerCase().trim();
+  if (text.includes(query)) return true;
+  const textWords = text.split(/\s+/);
+  const queryWords = query.split(/\s+/);
+  return queryWords.every(qw =>
+    textWords.some(tw => levenshtein(tw, qw) <= Math.max(1, Math.ceil(qw.length / 3)))
+  );
+}
+
+function authorMatchesQuery(author, query) {
+  if (fuzzyMatch(author.name, query)) return true;
+  return author.books.some(book => {
+    if (fuzzyMatch(book.title, query)) return true;
+    if (book.volumes) {
+      return book.volumes.some(vol => fuzzyMatch(vol.title, query));
+    }
+    return false;
+  });
+}
+
 function showHome(filterText = '') {
-  const query = filterText.trim().toLowerCase();
+  const query = filterText.trim();
   const filtered = AUTHORS
-    .filter(a => a.name.toLowerCase().includes(query))
+    .filter(a => authorMatchesQuery(a, query))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
   let listHtml = '';
@@ -546,7 +584,7 @@ function showHome(filterText = '') {
   }
 
   content.innerHTML = `
-    <input type="text" id="authorSearch" placeholder="Поиск автора…" autocomplete="off" value="${filterText}">
+    <input type="text" id="authorSearch" placeholder="Поиск автора или книги…" autocomplete="off" value="${filterText}">
     <div id="authorButtons">${listHtml}</div>
   `;
 
