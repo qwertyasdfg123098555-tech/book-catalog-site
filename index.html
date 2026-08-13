@@ -543,6 +543,7 @@ const AUTHORS = [
         title: "Аль Арабия Байна Ядейк Том 4",
         cover: "https://i.ibb.co/VpJNMRry/Al-Arabia-Bayna-Yadayk-4-Tom-A.jpg",
         description: "",
+        hideTitle: true,
         volumes: [
           {
             title: "Аль Арабия Байна Ядейк Том 4 (А)",
@@ -700,7 +701,7 @@ function showAuthorBooks(id) {
           <div class="book-card">
             ${book.cover ? `<img class="cover" src="${book.cover}" alt="${book.title}">` : ''}
             <div class="card-body">
-              <h3>${book.title}</h3>
+              ${book.hideTitle ? '' : `<h3>${book.title}</h3>`}
               ${book.description ? `<p class="description">${book.description}</p>` : ''}
               <div class="volume-list">${volumesHtml}</div>
             </div>
