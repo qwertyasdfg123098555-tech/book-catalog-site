@@ -538,6 +538,29 @@ const AUTHORS = [
         largeFile: true,
         readUrl: "https://archive.org/download/al-arabia-bayna-yadayk-3-tom/Al%20Arabia%20Bayna%20Yadayk%203%20Tom.pdf",
         downloadUrl: "https://archive.org/download/al-arabia-bayna-yadayk-3-tom/Al%20Arabia%20Bayna%20Yadayk%203%20Tom.pdf"
+      },
+      {
+        title: "Аль Арабия Байна Ядейк Том 4",
+        cover: "https://i.ibb.co/YKMzWtj/Al-Arabia-Bayna-Yadayk-4-Tom-A.jpg",
+        description: "",
+        volumes: [
+          {
+            title: "Аль Арабия Байна Ядейк Том 4 (А)",
+            format: "PDF",
+            size: "133 МБ",
+            largeFile: true,
+            readUrl: "https://archive.org/download/al-arabia-bayna-yadayk-4-tom-a/Al%20Arabia%20Bayna%20Yadayk%204%20Tom%20%28A%29.pdf",
+            downloadUrl: "https://archive.org/download/al-arabia-bayna-yadayk-4-tom-a/Al%20Arabia%20Bayna%20Yadayk%204%20Tom%20%28A%29.pdf"
+          },
+          {
+            title: "Аль Арабия Байна Ядейк Том 4 (Б)",
+            format: "PDF",
+            size: "137 МБ",
+            largeFile: true,
+            readUrl: "https://archive.org/download/al-arabia-bayna-yadayk-4-tom-b/Al%20Arabia%20Bayna%20Yadayk%204%20Tom%20%28B%29.pdf",
+            downloadUrl: "https://archive.org/download/al-arabia-bayna-yadayk-4-tom-b/Al%20Arabia%20Bayna%20Yadayk%204%20Tom%20%28B%29.pdf"
+          }
+        ]
       }
     ]
   }
@@ -667,7 +690,7 @@ function showAuthorBooks(id) {
               <h4>${vol.title}</h4>
               <span class="file-info">${vol.format}, ${vol.size}</span>
               <div class="book-actions">
-                ${vol.readUrl ? `<a class="read-btn" href="${vol.readUrl}">Читать</a>` : ''}
+                ${vol.readUrl ? `<a class="read-btn" href="${vol.readUrl}"${vol.largeFile ? ' target="_blank" rel="noopener"' : ''}>Читать</a>` : ''}
                 ${vol.downloadUrl ? `<a class="download-btn" href="${vol.downloadUrl}" data-filename="${vol.title}.pdf">Скачать</a>` : ''}
               </div>
             </div>
