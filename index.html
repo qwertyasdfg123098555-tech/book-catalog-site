@@ -515,6 +515,7 @@ const AUTHORS = [
         description: "",
         format: "PDF",
         size: "167 МБ",
+        largeFile: true,
         readUrl: "https://archive.org/download/al-arabia-bayna-yadayk-1-tom/Al%20Arabia%20Bayna%20Yadayk%201%20Tom.pdf",
         downloadUrl: "https://archive.org/download/al-arabia-bayna-yadayk-1-tom/Al%20Arabia%20Bayna%20Yadayk%201%20Tom.pdf"
       }
@@ -672,7 +673,7 @@ function showAuthorBooks(id) {
               ${book.description ? `<p class="description">${book.description}</p>` : ''}
               <span class="file-info">${book.format}, ${book.size}</span>
               <div class="book-actions">
-                ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}">Читать</a>` : ''}
+                ${book.readUrl ? `<a class="read-btn" href="${book.readUrl}"${book.largeFile ? ' target="_blank" rel="noopener"' : ''}>Читать</a>` : ''}
                 ${book.downloadUrl ? `<a class="download-btn" href="${book.downloadUrl}" data-filename="${book.title}.pdf">Скачать</a>` : ''}
               </div>
             </div>
